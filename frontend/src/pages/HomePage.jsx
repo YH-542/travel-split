@@ -10,8 +10,6 @@ const DEFAULT_COVERS = [
   'https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=800&q=80',
 ]
 
-import { supabase } from '../utils/supabaseClient'
-
 export default function HomePage({ user }) {
   const [events, setEvents] = useState([])
   const [showCreate, setShowCreate] = useState(false)
