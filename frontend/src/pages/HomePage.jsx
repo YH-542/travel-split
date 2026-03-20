@@ -98,7 +98,7 @@ export default function HomePage({ user }) {
     e.preventDefault()
     if (!newEventName.trim()) return
     try {
-      const event = await api.createEvent(newEventName.trim(), newEventImageUrl || '')
+      const event = await api.createEvent(newEventName.trim(), [], newEventImageUrl || '')
       if (myGlobalName) await api.addMember(event.id, myGlobalName)
       setNewEventName(''); setNewEventImage(null); setNewEventImageUrl(''); setShowCreate(false)
       navigate(`/events/${event.id}`)
