@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { api, getImageUrl } from '../utils/api'
+import { supabase } from '../utils/supabaseClient'
 
 const DEFAULT_COVERS = [
   'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80',
@@ -31,7 +32,21 @@ export default function EventDashboard({ user }) {
 
   const myName = user?.user_metadata?.full_name || user?.email
 
-  useEffect(() => { loadEvent() }, [eventId])
+  useEffect(() => { 
+    loadEvent() 
+
+    // Set up real-time subscription
+    const channel = supabase.channel(`event_${eventId}_updates`)
+      .on('postgres_changes', { event: '*', schema: 'public' }, (payload) => {
+        console.log('Realtime change detected:', payload)
+        loadEvent()
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [eventId])
 
   async function loadEvent() {
     try { 
@@ -131,17 +146,17 @@ export default function EventDashboard({ user }) {
       </header>
 
       {/* ── Native Segmented Control ── */}
-      <div className="px-5 mb-6">
-        <div className="flex bg-[#111114] rounded-xl p-1 relative">
+      <div className="px-5 mb-8 mt-2">
+        <div className="flex bg-[#111114] rounded-xl p-1.5 relative h-[52px]">
           {TABS.map(tab => (
             <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all duration-200 z-10
+              className={`flex-1 flex items-center justify-center rounded-lg text-sm font-bold transition-all duration-200 z-10
                 ${activeTab === tab.key ? 'text-black' : 'text-[#888888] hover:text-white'}`}>
               {tab.label}
             </button>
           ))}
           {/* Active slider background */}
-          <div className="absolute top-1 bottom-1 w-[calc(33.333%-2px)] bg-[#00F0FF] rounded-lg transition-transform duration-300 ease-out"
+          <div className="absolute top-1.5 bottom-1.5 w-[calc(33.333%-4px)] bg-[#00F0FF] rounded-lg transition-transform duration-300 ease-out"
                style={{ transform: `translateX(${TABS.findIndex(t => t.key === activeTab) * 100}%)` }} />
         </div>
       </div>

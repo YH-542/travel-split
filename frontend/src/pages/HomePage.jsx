@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, getImageUrl } from '../utils/api'
+import { supabase } from '../utils/supabaseClient'
 
 const DEFAULT_COVERS = [
   'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80',
@@ -25,7 +26,17 @@ export default function HomePage({ user }) {
   
   const myName = user?.user_metadata?.full_name || user?.email
 
-  useEffect(() => { loadEventsWithDetails() }, [user])
+  useEffect(() => { 
+    loadEventsWithDetails() 
+
+    const channel = supabase.channel('homepage_updates')
+      .on('postgres_changes', { event: '*', schema: 'public' }, () => {
+        loadEventsWithDetails()
+      })
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [user])
 
   async function loadEventsWithDetails() {
     setLoading(true)
