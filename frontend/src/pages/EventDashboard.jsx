@@ -127,8 +127,8 @@ export default function EventDashboard({ user }) {
         <div className="relative z-10 pt-12 pb-8 px-5">
           <div className="flex items-center gap-4 mb-8">
             <button onClick={() => navigate('/')}
-              className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center hover:bg-black/50 transition-colors active:scale-95">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+              className="w-12 h-12 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center hover:bg-black/50 transition-colors active:scale-95">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
             <div className="flex-1 min-w-0">
               <h1 className="text-xl font-bold text-white truncate tracking-tight drop-shadow-lg">{event.name}</h1>
@@ -234,11 +234,11 @@ export default function EventDashboard({ user }) {
                   </div>
                   <div className="text-right">
                     <p className="text-base font-bold text-white font-numeric tracking-tight">¥{Number(payment.amount).toLocaleString()}</p>
-                    <div className="flex justify-end gap-3 mt-1">
+                    <div className="flex justify-end gap-1 mt-1">
                       <button onClick={() => navigate(`/events/${eventId}/payments/${payment.id}/edit`)}
-                        className="text-[10px] uppercase font-bold text-[#00F0FF] pt-1">Edit</button>
+                        className="text-xs uppercase font-bold text-[#00F0FF] px-3 py-2 -mr-2 bg-[#00F0FF]/10 rounded-lg active:scale-95 transition-transform">Edit</button>
                       <button onClick={() => handleDeletePayment(payment.id)}
-                        className="text-[10px] uppercase font-bold text-[#FF3B30] pt-1">Del</button>
+                        className="text-xs uppercase font-bold text-[#FF3B30] px-3 py-2 -mr-2 bg-[#FF3B30]/10 rounded-lg active:scale-95 transition-transform ml-2">Del</button>
                     </div>
                   </div>
                 </div>
@@ -269,12 +269,12 @@ export default function EventDashboard({ user }) {
                   <>
                     <span className="flex-1 text-base font-bold text-white">{member.name}</span>
                     <button onClick={() => { setEditingMember(member.id); setEditMemberName(member.name) }}
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-[#888] hover:bg-[#111] hover:text-[#00F0FF]">
-                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-[#888] hover:bg-[#111] hover:text-[#00F0FF] transition-colors active:scale-95">
+                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     </button>
                     <button onClick={() => handleDeleteMember(member.id, member.name)}
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-[#888] hover:bg-[#111] hover:text-[#FF3B30]">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-[#888] hover:bg-[#111] hover:text-[#FF3B30] transition-colors active:scale-95">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
                     </button>
                   </>
                 )}

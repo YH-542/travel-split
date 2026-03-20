@@ -132,8 +132,8 @@ export default function PaymentForm({ user }) {
           <div className="px-5 pt-10 pb-2">
             <div className="flex items-center justify-between">
               <button onClick={() => navigate(`/events/${eventId}`)}
-                className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center hover:bg-black/50 transition-colors active:scale-95 text-white">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+                className="w-12 h-12 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center hover:bg-black/50 transition-colors active:scale-95 text-white">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>
               </button>
               <span className="text-[11px] font-bold tracking-widest text-white/70 uppercase">
                 {isEdit ? 'Edit Transaction' : 'New Transaction'}
@@ -250,9 +250,9 @@ export default function PaymentForm({ user }) {
                 return (
                   <div key={m.id} className={`bank-card p-2 pl-4 flex items-center gap-4 stagger-${i+1}`}>
                     <button type="button" onClick={() => toggleMember(m.id)}
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0
+                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0
                         ${sp.checked ? 'bg-[#00F0FF] border-[#00F0FF]' : 'border-[#444]'}`}>
-                      {sp.checked && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>}
+                      {sp.checked && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>}
                     </button>
                     <span className={`text-base font-bold flex-1 ${sp.checked ? 'text-white' : 'text-[#666]'}`}>{m.name}</span>
                     {sp.checked && (
@@ -280,9 +280,9 @@ export default function PaymentForm({ user }) {
                 return (
                   <div key={m.id} className={`bank-card p-2 pl-4 flex items-center gap-4 stagger-${i+1}`}>
                     <button type="button" onClick={() => toggleMember(m.id)}
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0
+                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0
                         ${sp.checked ? 'bg-[#00F0FF] border-[#00F0FF]' : 'border-[#444]'}`}>
-                      {sp.checked && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>}
+                      {sp.checked && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>}
                     </button>
                     <span className={`text-base font-bold flex-1 ${sp.checked ? 'text-white' : 'text-[#666]'}`}>{m.name}</span>
                     {sp.checked && (

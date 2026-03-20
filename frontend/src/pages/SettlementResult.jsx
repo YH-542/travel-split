@@ -125,8 +125,8 @@ export default function SettlementResult({ user }) {
         <div className="relative z-10 px-5 pt-10 pb-8">
           <div className="flex items-center justify-between mb-8">
             <button onClick={() => navigate(`/events/${eventId}`)}
-              className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center hover:bg-black/50 transition-colors active:scale-95 text-white">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+              className="w-12 h-12 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center hover:bg-black/50 transition-colors active:scale-95 text-white">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
             <span className="text-xs font-bold tracking-widest text-[#00F0FF] uppercase px-4 py-1.5 rounded-full bg-black/30 backdrop-blur-md">
               Settlement
