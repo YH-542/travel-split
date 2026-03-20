@@ -18,7 +18,7 @@ const CATEGORY_MAP = {
   other: { icon: '📦', label: 'その他' },
 }
 
-export default function EventDashboard() {
+export default function EventDashboard({ user }) {
   const { eventId } = useParams()
   const navigate = useNavigate()
   const [event, setEvent] = useState(null)
@@ -29,16 +29,21 @@ export default function EventDashboard() {
   const [editMemberName, setEditMemberName] = useState('')
   const [activeTab, setActiveTab] = useState('overview')
 
+  const myName = user?.user_metadata?.full_name || user?.email
+
   useEffect(() => { loadEvent() }, [eventId])
 
   async function loadEvent() {
-    try { setEvent(await api.getEvent(eventId)) }
+    try { 
+      const data = await api.getEvent(eventId)
+      setEvent(data)
+    }
     catch (e) { console.error(e) }
     finally { setLoading(false) }
   }
 
   async function handleAddMember(e) {
-    e.preventDefault()
+    if (e) e.preventDefault()
     if (!newMemberName.trim()) return
     try {
       await api.addMember(eventId, newMemberName.trim())
@@ -200,6 +205,7 @@ export default function EventDashboard() {
               </div>
             ) : event.payments.map((payment, i) => {
               const cat = CATEGORY_MAP[payment.category] || CATEGORY_MAP.other
+              const payer = event.members.find(m => m.id === payment.payer_id)
               return (
                 <div key={payment.id} className={`p-4 border-b border-[#333]/30 last:border-0 flex items-center gap-4 animate-slide-up stagger-${i + 1}`}>
                   <div className="w-12 h-12 rounded-full bg-[#1C1C21] flex items-center justify-center text-xl flex-shrink-0 shadow-inner">
@@ -208,7 +214,7 @@ export default function EventDashboard() {
                   <div className="flex-1 min-w-0">
                     <p className="text-base font-bold text-white truncate">{payment.memo || cat.label}</p>
                     <p className="text-[11px] text-[#888] mt-0.5 tracking-wide">
-                      PAID BY <span className="text-[#ccc]">{payment.payer_name}</span>
+                      PAID BY <span className="text-[#ccc] uppercase">{payer?.name || 'Unknown'}</span>
                     </p>
                   </div>
                   <div className="text-right">

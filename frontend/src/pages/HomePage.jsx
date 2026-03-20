@@ -9,11 +9,10 @@ const DEFAULT_COVERS = [
   'https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=800&q=80',
 ]
 
-export default function HomePage() {
+import { supabase } from '../utils/supabaseClient'
+
+export default function HomePage({ user }) {
   const [events, setEvents] = useState([])
-  const [myGlobalName, setMyGlobalName] = useState(() => localStorage.getItem('travelSplit_myName') || '')
-  const [isEditingName, setIsEditingName] = useState(!localStorage.getItem('travelSplit_myName'))
-  const [tempName, setTempName] = useState(myGlobalName)
   const [showCreate, setShowCreate] = useState(false)
   const [newEventName, setNewEventName] = useState('')
   const [newEventImage, setNewEventImage] = useState(null)
@@ -24,38 +23,50 @@ export default function HomePage() {
   const fileInputRef = useRef(null)
   const navigate = useNavigate()
 
-  useEffect(() => { loadEventsWithDetails() }, [myGlobalName])
+  useEffect(() => { loadEventsWithDetails() }, [user])
 
   async function loadEventsWithDetails() {
     setLoading(true)
     try {
-      const basicEvents = await api.getEvents()
-      const detailedEvents = await Promise.all(
-        basicEvents.map(async (e) => {
-          try {
-            const detail = await api.getEvent(e.id)
-            let myCost = 0
-            let isParticipating = false
-            if (myGlobalName) {
-              const me = detail.members.find(m => m.name.toLowerCase() === myGlobalName.toLowerCase())
-              if (me) {
-                isParticipating = true
-                detail.payments.forEach(p => {
-                  const totalR = p.splits.reduce((s, x) => s + x.ratio, 0)
-                  if (totalR > 0) {
-                    const mySplit = p.splits.find(s => s.member_id === me.id)
-                    if (mySplit) myCost += (mySplit.ratio / totalR) * p.amount
-                  }
-                })
-              }
+      const allEvents = await api.getEvents()
+      const myName = user?.user_metadata?.full_name || user?.email
+      
+      const detailedEvents = allEvents.map((e) => {
+        let myCost = 0
+        let isParticipating = false
+        let eventTotal = 0
+
+        // Calculate event total and personal cost if joined
+        const me = e.members.find(m => m.name.toLowerCase() === myName?.toLowerCase())
+        if (me) isParticipating = true
+
+        e.payments.forEach(p => {
+          eventTotal += Number(p.amount)
+          const totalR = p.splits.reduce((s, x) => s + x.ratio, 0)
+          if (totalR > 0) {
+            if (me) {
+              const mySplit = p.splits.find(s => s.member_id === me.id)
+              if (mySplit) myCost += (mySplit.ratio / totalR) * p.amount
             }
-            return { ...detail, myCost, isParticipating, total_amount: e.total_amount, member_count: e.member_count }
-          } catch { return { ...e, members: [], payments: [], myCost: 0, isParticipating: false } }
+          }
         })
-      )
+
+        return { 
+          ...e, 
+          myCost, 
+          isParticipating, 
+          total_amount: eventTotal, 
+          member_count: e.members.length 
+        }
+      })
       setEvents(detailedEvents)
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
+  }
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    navigate('/')
   }
 
   function handleSaveName(e) {
@@ -126,28 +137,26 @@ export default function HomePage() {
   return (
     <div className="min-h-dvh flex flex-col relative overflow-hidden bg-[#0A0A0E]">
       {/* ── Header ── */}
-      <header className="px-6 pt-14 pb-6 relative z-10">
-        {isEditingName ? (
-          <form onSubmit={handleSaveName} className="flex gap-3 animate-slide-up">
-            <input type="text" value={tempName} onChange={e => setTempName(e.target.value)}
-              placeholder="あなたの名前を入力..." autoFocus
-              className="!py-3 !text-sm flex-1 !bg-[#1A1A24] !border-[#333] focus:!border-[#00F0FF]" />
-            <button type="submit" className="text-[#00F0FF] font-bold px-4 bg-[#00F0FF]/10 rounded-xl text-sm whitespace-nowrap">保存</button>
-          </form>
-        ) : (
-          <div className="flex items-center gap-4 animate-slide-up cursor-pointer"
-            onClick={() => { setTempName(myGlobalName); setIsEditingName(true) }}>
-            <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#00F0FF] to-[#7000FF] p-[2px] shadow-[0_0_15px_rgba(0,240,255,0.3)]">
-              <div className="w-full h-full bg-[#111114] rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">{myGlobalName ? myGlobalName.charAt(0).toUpperCase() : '?'}</span>
-              </div>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-white tracking-tight">Hi, {myGlobalName || 'ゲスト'} 👋</h1>
-              <p className="text-[11px] text-[#888] font-medium">Welcome back.</p>
+      <header className="px-6 pt-14 pb-6 relative z-10 flex items-center justify-between">
+        <div className="flex items-center gap-4 animate-slide-up">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#00F0FF] to-[#7000FF] p-[2px] shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+            <div className="w-full h-full bg-[#111114] rounded-full flex items-center justify-center overflow-hidden">
+              {user?.user_metadata?.avatar_url ? (
+                <img src={user.user_metadata.avatar_url} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-white font-bold text-lg">{user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0).toUpperCase()}</span>
+              )}
             </div>
           </div>
-        )}
+          <div>
+            <h1 className="text-xl font-bold text-white tracking-tight">Hi, {user?.user_metadata?.full_name?.split(' ')[0] || 'User'} 👋</h1>
+            <p className="text-[11px] text-[#888] font-medium">Ready for the next trip?</p>
+          </div>
+        </div>
+        <button onClick={handleLogout}
+          className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        </button>
       </header>
 
       {/* ── Main ── */}

@@ -16,7 +16,7 @@ const CATEGORIES = [
   { key: 'other', icon: '📦', label: 'その他' },
 ]
 
-export default function PaymentForm() {
+export default function PaymentForm({ user }) {
   const { eventId, paymentId } = useParams()
   const navigate = useNavigate()
   const isEdit = !!paymentId
@@ -73,13 +73,17 @@ export default function PaymentForm() {
 
     setSubmitting(true)
     try {
-      let splits = null
+      let splits = []
 
-      if (splitMode === 'amount') {
+      if (splitMode === 'equal') {
+        const checked = Object.entries(customSplits).filter(([, v]) => v.checked)
+        if (checked.length === 0) return alert('対象者を1人以上選んでください')
+        splits = checked.map(([id]) => ({ member_id: id, ratio: 1.0 }))
+      } else if (splitMode === 'amount') {
         const checked = Object.entries(customSplits).filter(([, v]) => v.checked && Number(v.amount) > 0)
         if (checked.length === 0) return alert('負担額を1人以上入力してください')
         const totalSpecified = checked.reduce((s, [, v]) => s + Number(v.amount), 0)
-        if (Math.abs(totalSpecified - amountNum) > 1) {
+        if (Math.abs(totalSpecified - amountNum) > 2) {
           return alert(`指定額の合計 (¥${totalSpecified.toLocaleString()}) と支払額 (¥${amountNum.toLocaleString()}) が一致しません`)
         }
         splits = checked.map(([id, v]) => ({ member_id: id, ratio: Number(v.amount) }))

@@ -1,54 +1,157 @@
-const API_BASE = import.meta.env.VITE_API_BASE || '/api';
-const UPLOAD_BASE = import.meta.env.VITE_API_BASE ? import.meta.env.VITE_API_BASE.replace('/api', '') : '';
+import { supabase } from './supabaseClient'
 
-async function request(url, options = {}) {
-  const config = {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  };
-  
-  const response = await fetch(`${API_BASE}${url}`, config);
-  
-  if (response.status === 204) return null;
-  
-  const data = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(data.error || 'エラーが発生しました');
+export const api = {
+  // --- Events ---
+  async getEvents() {
+    const { data, error } = await supabase
+      .from('events')
+      .select('*, members(*), payments(*, splits:payment_splits(*))')
+      .order('created_at', { ascending: false })
+    if (error) throw error
+    return data
+  },
+
+  async getEvent(id) {
+    const { data, error } = await supabase
+      .from('events')
+      .select('*, members(*), payments(*, splits:payment_splits(*))')
+      .eq('id', id)
+      .single()
+    if (error) throw error
+    return data
+  },
+
+  async createEvent(name, members, imageUrl = '') {
+    const { data: event, error: eventError } = await supabase
+      .from('events')
+      .insert({ name, image_url: imageUrl })
+      .select().single()
+    if (eventError) throw eventError
+
+    if (members && members.length > 0) {
+      await supabase.from('members')
+        .insert(members.map(m => ({ event_id: event.id, name: m })))
+    }
+    return event
+  },
+
+  async updateEvent(id, data) {
+    const { data: event, error } = await supabase
+      .from('events')
+      .update({ name: data.name, image_url: data.image_url })
+      .eq('id', id)
+      .select().single()
+    if (error) throw error
+    return event
+  },
+
+  async deleteEvent(id) {
+    await supabase.from('events').delete().eq('id', id)
+  },
+
+  // --- Members ---
+  async getMembers(eventId) {
+    const { data, error } = await supabase
+      .from('members')
+      .select('*')
+      .eq('event_id', eventId)
+    if (error) throw error
+    return data
+  },
+
+  async addMember(eventId, name) {
+    const { data, error } = await supabase
+      .from('members')
+      .insert({ event_id: eventId, name })
+      .select().single()
+    if (error) throw error
+    return data
+  },
+
+  async updateMember(eventId, id, name) {
+    const { data, error } = await supabase
+      .from('members')
+      .update({ name })
+      .eq('id', id)
+      .select().single()
+    if (error) throw error
+    return data
+  },
+
+  async deleteMember(eventId, id) {
+    const { error } = await supabase
+      .from('members')
+      .delete()
+      .eq('id', id)
+    if (error) throw error
+  },
+
+  // --- Payments ---
+  async addPayment(eventId, data) {
+    const { data: payment, error: pError } = await supabase
+      .from('payments')
+      .insert({
+        event_id: eventId,
+        payer_id: data.payer_id,
+        amount: data.amount,
+        category: data.category,
+        memo: data.memo
+      })
+      .select().single()
+    if (pError) throw pError
+
+    if (data.splits && data.splits.length > 0) {
+      await supabase.from('payment_splits')
+        .insert(data.splits.map(s => ({
+          payment_id: payment.id,
+          member_id: s.member_id,
+          ratio: s.ratio
+        })))
+    }
+    return payment
+  },
+
+  async updatePayment(eventId, paymentId, data) {
+    const { error: pError } = await supabase
+      .from('payments')
+      .update({
+        payer_id: data.payer_id,
+        amount: data.amount,
+        category: data.category,
+        memo: data.memo
+      })
+      .eq('id', paymentId)
+    if (pError) throw pError
+
+    await supabase.from('payment_splits').delete().eq('payment_id', paymentId)
+    if (data.splits && data.splits.length > 0) {
+      await supabase.from('payment_splits')
+        .insert(data.splits.map(s => ({
+          payment_id: paymentId,
+          member_id: s.member_id,
+          ratio: s.ratio
+        })))
+    }
+  },
+
+  async deletePayment(eventId, id) {
+    await supabase.from('payments').delete().eq('id', id)
+  },
+
+  // --- Media ---
+  async uploadImage(base64) {
+    const res = await fetch(base64)
+    const blob = await res.blob()
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`
+    const { data, error } = await supabase.storage.from('covers').upload(fileName, blob, { contentType: 'image/jpeg' })
+    if (error) throw error
+    return { url: data.path }
   }
-  
-  return data;
 }
 
 export function getImageUrl(path) {
-  if (!path) return '';
-  if (path.startsWith('http')) return path;
-  return `${UPLOAD_BASE}${path}`;
+  if (!path) return ''
+  if (path.startsWith('http')) return path
+  const { data } = supabase.storage.from('covers').getPublicUrl(path)
+  return data.publicUrl
 }
-
-export const api = {
-  // Events
-  getEvents: () => request('/events'),
-  getEvent: (id) => request(`/events/${id}`),
-  createEvent: (name, image_url) => request('/events', { method: 'POST', body: JSON.stringify({ name, image_url }) }),
-  updateEvent: (id, data) => request(`/events/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  deleteEvent: (id) => request(`/events/${id}`, { method: 'DELETE' }),
-
-  // Members
-  getMembers: (eventId) => request(`/events/${eventId}/members`),
-  addMember: (eventId, name) => request(`/events/${eventId}/members`, { method: 'POST', body: JSON.stringify({ name }) }),
-  updateMember: (eventId, id, name) => request(`/events/${eventId}/members/${id}`, { method: 'PUT', body: JSON.stringify({ name }) }),
-  deleteMember: (eventId, id) => request(`/events/${eventId}/members/${id}`, { method: 'DELETE' }),
-
-  // Payments
-  getPayments: (eventId) => request(`/events/${eventId}/payments`),
-  addPayment: (eventId, data) => request(`/events/${eventId}/payments`, { method: 'POST', body: JSON.stringify(data) }),
-  updatePayment: (eventId, id, data) => request(`/events/${eventId}/payments/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  deletePayment: (eventId, id) => request(`/events/${eventId}/payments/${id}`, { method: 'DELETE' }),
-
-  // Settlement
-  getSettlement: (eventId) => request(`/events/${eventId}/settlement`),
-
-  // Upload
-  uploadImage: (base64Data) => request('/upload', { method: 'POST', body: JSON.stringify({ image: base64Data }) }),
-};
