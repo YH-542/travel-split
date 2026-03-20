@@ -1,0 +1,189 @@
+@import "tailwindcss";
+
+/* ========================================
+   Plan G: Premium Banking UX (Dark)
+   ======================================== */
+
+@theme {
+  /* Ultra-dark Premium Backgrounds */
+  --color-bg-base: #000000;
+  --color-bg-elevated: #111114;
+  --color-bg-card: #1C1C21;
+  
+  /* Accents: Electric Cyan & Deep Violet (Glowing FinTech feel) */
+  --color-accent-primary: #00F0FF;
+  --color-accent-secondary: #7000FF;
+  
+  /* Semantic: Receiving (+) and Sending (-) */
+  --color-success: #00FF7F;
+  --color-danger: #FF3B30;
+
+  --font-family-ui: 'Inter', 'Noto Sans JP', sans-serif;
+  --font-family-numeric: 'Outfit', 'Inter', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  font-family: var(--font-family-ui);
+  background: var(--color-bg-base);
+  color: #FFFFFF;
+  margin: 0;
+  padding: 0;
+  min-height: 100dvh;
+  /* Prevent bounce on iOS */
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Typography Utilities */
+.font-numeric {
+  font-family: var(--font-family-numeric);
+}
+
+/* Cards & Surface */
+.bank-card {
+  background: var(--color-bg-card);
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  /* extremely subtle border */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.bank-card:active {
+  transform: scale(0.97);
+}
+
+.bank-surface {
+  background: var(--color-bg-elevated);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* Neon Gradient Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, #00F0FF, #00B4F0);
+  color: #000000;
+  font-weight: 700;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 240, 255, 0.25);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s;
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 10px rgba(0, 240, 255, 0.15);
+}
+
+.btn-primary:disabled {
+  background: #333333;
+  color: #666666;
+  box-shadow: none;
+  transform: none;
+}
+
+.fab {
+  background: #00F0FF;
+  color: #000000;
+  border-radius: 50%;
+  box-shadow: 0 8px 32px rgba(0, 240, 255, 0.3);
+  transition: transform 0.2s;
+}
+
+.fab:active {
+  transform: scale(0.9);
+}
+
+/* Animations */
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.10s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.20s; }
+
+/* Sticky Bottom Action Container (Safe Area Aware) */
+.sticky-bottom-action {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 20px calc(24px + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+  z-index: 50;
+  pointer-events: none; /* Let clicks pass through gradient */
+}
+
+.sticky-bottom-action > button,
+.sticky-bottom-action > div {
+  pointer-events: auto; /* Re-enable clicks for the actual button */
+}
+
+/* Form Inputs (Bank Style) */
+input, select, textarea {
+  background: var(--color-bg-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 16px 20px;
+  color: #FFFFFF;
+  font-size: 16px;
+  width: 100%;
+  transition: all 0.2s;
+  font-family: var(--font-family-ui);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-accent-primary);
+  background: var(--color-bg-card);
+}
+
+input::placeholder {
+  color: #666666;
+}
+
+/* Massive Numeric Input (For Amount) */
+.input-massive {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+  padding: 8px 0;
+  color: #FFFFFF;
+  font-family: var(--font-family-numeric);
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.input-massive:focus {
+  border-color: var(--color-accent-primary);
+  background: transparent;
+}
+
+/* Disable spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] { -moz-appearance: textfield; }

@@ -1,0 +1,20 @@
+{
+  "name": "travel-split-backend",
+  "version": "1.0.0",
+  "description": "Travel Split - Group expense splitting backend API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --forceExit"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "uuid": "^11.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
