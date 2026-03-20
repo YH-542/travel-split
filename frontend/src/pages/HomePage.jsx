@@ -22,6 +22,8 @@ export default function HomePage({ user }) {
   const [isUploadingBg, setIsUploadingBg] = useState(false)
   const fileInputRef = useRef(null)
   const navigate = useNavigate()
+  
+  const myName = user?.user_metadata?.full_name || user?.email
 
   useEffect(() => { loadEventsWithDetails() }, [user])
 
@@ -29,7 +31,6 @@ export default function HomePage({ user }) {
     setLoading(true)
     try {
       const allEvents = await api.getEvents()
-      const myName = user?.user_metadata?.full_name || user?.email
       
       const detailedEvents = allEvents.map((e) => {
         let myCost = 0
@@ -69,14 +70,6 @@ export default function HomePage({ user }) {
     navigate('/')
   }
 
-  function handleSaveName(e) {
-    if (e) e.preventDefault()
-    if (!tempName.trim()) return
-    setMyGlobalName(tempName.trim())
-    localStorage.setItem('travelSplit_myName', tempName.trim())
-    setIsEditingName(false)
-  }
-
   async function handleImageSelect(e) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -99,7 +92,7 @@ export default function HomePage({ user }) {
     if (!newEventName.trim()) return
     try {
       const event = await api.createEvent(newEventName.trim(), [], newEventImageUrl || '')
-      if (myGlobalName) await api.addMember(event.id, myGlobalName)
+      if (myName) await api.addMember(event.id, myName)
       setNewEventName(''); setNewEventImage(null); setNewEventImageUrl(''); setShowCreate(false)
       navigate(`/events/${event.id}`)
     } catch (err) { alert(err.message) }
