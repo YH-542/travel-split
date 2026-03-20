@@ -157,17 +157,17 @@ export default function PaymentForm({ user }) {
       <div className="flex-1 px-5 space-y-8 animate-slide-up">
         {/* ── Payer ── */}
         <div>
-          <label className="block text-[10px] font-bold tracking-[0.15em] uppercase text-[#888] mb-3">Paid By</label>
+          <label className="block text-xs font-bold tracking-[0.15em] uppercase text-[#888] mb-3">Paid By</label>
           <div className="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar" style={{ scrollbarWidth: 'none' }}>
             {members.map(m => (
               <button key={m.id} type="button" onClick={() => setPayerId(m.id)}
-                className={`flex-shrink-0 flex items-center gap-3 px-5 py-4 rounded-xl transition-all duration-200 snap-center
+                className={`flex-shrink-0 flex items-center gap-3 px-6 py-5 rounded-2xl transition-all duration-200 snap-center
                   ${payerId === m.id
                     ? 'border-2 border-[#00F0FF] bg-[#00F0FF]/10 shadow-[0_4px_20px_rgba(0,240,255,0.15)]'
                     : 'bg-[#111114] border-2 border-transparent text-[#888]'}`}>
-                <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
+                <span className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-bold
                   ${payerId === m.id ? 'bg-[#00F0FF] text-black' : 'bg-[#1C1C21]'}`}>{m.name.charAt(0)}</span>
-                <span className={`text-sm font-bold ${payerId === m.id ? 'text-white' : 'text-[#888]'}`}>{m.name}</span>
+                <span className={`text-base font-bold ${payerId === m.id ? 'text-white' : 'text-[#888]'}`}>{m.name}</span>
               </button>
             ))}
           </div>
@@ -175,16 +175,16 @@ export default function PaymentForm({ user }) {
 
         {/* ── Category ── */}
         <div>
-          <label className="block text-[10px] font-bold tracking-[0.15em] uppercase text-[#888] mb-3">Category</label>
+          <label className="block text-xs font-bold tracking-[0.15em] uppercase text-[#888] mb-3">Category</label>
           <div className="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar" style={{ scrollbarWidth: 'none' }}>
             {CATEGORIES.map(cat => (
               <button key={cat.key} type="button" onClick={() => setCategory(cat.key)}
-                className={`flex-shrink-0 flex flex-col items-center justify-center w-[84px] h-[84px] rounded-xl transition-all duration-200 snap-center
+                className={`flex-shrink-0 flex flex-col items-center justify-center w-[96px] h-[96px] rounded-2xl transition-all duration-200 snap-center
                   ${category === cat.key
                     ? 'bg-white text-black shadow-lg scale-105'
                     : 'bg-[#111114] text-[#888] hover:bg-[#1C1C21]'}`}>
-                <span className="text-3xl mb-1">{cat.icon}</span>
-                <span className="text-[10px] font-bold">{cat.label}</span>
+                <span className="text-4xl mb-1">{cat.icon}</span>
+                <span className="text-xs font-bold">{cat.label}</span>
               </button>
             ))}
           </div>
@@ -192,7 +192,7 @@ export default function PaymentForm({ user }) {
 
         {/* ── Memo ── */}
         <div>
-          <label className="block text-[10px] font-bold tracking-[0.15em] uppercase text-[#888] mb-3">Note</label>
+          <label className="block text-xs font-bold tracking-[0.15em] uppercase text-[#888] mb-3">Note</label>
           <input type="text" value={memo} onChange={e => setMemo(e.target.value)} 
                  placeholder="What was this for?" 
                  className="!bg-[#111114] !border-transparent !text-lg !py-4" />
@@ -200,20 +200,20 @@ export default function PaymentForm({ user }) {
 
         {/* ── Split Mode ── */}
         <div className="pb-8">
-          <label className="block text-[10px] font-bold tracking-[0.15em] uppercase text-[#888] mb-3">Split Rules</label>
-          <div className="flex bg-[#111114] rounded-xl p-1 relative mb-5">
+          <label className="block text-xs font-bold tracking-[0.15em] uppercase text-[#888] mb-3">Split Rules</label>
+          <div className="flex bg-[#111114] rounded-xl p-1.5 relative mb-5 h-[52px]">
             {[
               { key: 'equal', label: '均等' },
               { key: 'amount', label: '金額指定' },
               { key: 'ratio', label: '比率' },
             ].map(m => (
               <button key={m.key} type="button" onClick={() => setSplitMode(m.key)}
-                className={`flex-1 py-3 rounded-lg text-xs font-bold transition-all duration-200 z-10
+                className={`flex-1 flex items-center justify-center rounded-lg text-sm font-bold transition-all duration-200 z-10
                   ${splitMode === m.key ? 'text-white' : 'text-[#888] hover:text-[#ccc]'}`}>
                 {m.label}
               </button>
             ))}
-            <div className="absolute top-1 bottom-1 w-[calc(33.333%-2px)] bg-[#333] rounded-lg transition-transform duration-300 ease-out"
+            <div className="absolute top-1.5 bottom-1.5 w-[calc(33.333%-4px)] bg-[#333] rounded-lg transition-transform duration-300 ease-out"
                  style={{ transform: `translateX(${['equal', 'amount', 'ratio'].indexOf(splitMode) * 100}%)` }} />
           </div>
 
@@ -304,7 +304,7 @@ export default function PaymentForm({ user }) {
       {/* ── Sticky Bottom Action ── */}
       <div className="sticky-bottom-action">
         <button type="button" onClick={handleSubmit} disabled={submitting || !amount || !payerId}
-          className="w-full btn-primary py-4 text-lg tracking-wide disabled:opacity-50">
+          className="w-full btn-primary py-5 text-xl font-bold tracking-wide disabled:opacity-50">
           {submitting ? '処理中…' : isEdit ? '更新する' : '支払いを追加'}
         </button>
       </div>
