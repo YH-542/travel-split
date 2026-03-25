@@ -18,76 +18,11 @@ export default function SettlementResult({ user }) {
 
   async function loadData() {
     try {
-      const e = await api.getEvent(eventId)
-      setEventDetail(e)
+      const eventData = await api.getEvent(eventId)
+      setEventDetail(eventData)
       
-      // Calculate settlement in frontend
-      const members = e.members.map(m => ({ ...m, paid: 0, owes: 0 }))
-      const mMap = {}
-      members.forEach(m => mMap[m.id] = m)
-
-      e.payments.forEach(p => {
-        if (mMap[p.payer_id]) mMap[p.payer_id].paid += p.amount
-        const totalR = p.splits.reduce((acc, s) => acc + s.ratio, 0)
-        if (totalR > 0) {
-          p.splits.forEach(s => {
-            if (mMap[s.member_id]) {
-              mMap[s.member_id].owes += (s.ratio / totalR) * p.amount
-            }
-          })
-        }
-      })
-
-      const balances = members.map(m => ({
-        id: m.id,
-        name: m.name,
-        paid: m.paid,
-        owes: m.owes,
-        balance: m.paid - m.owes
-      })).sort((a, b) => b.balance - a.balance)
-
-      const creditors = balances.filter(b => b.balance > 1).map(b => ({ ...b }))
-      const debtors = balances.filter(b => b.balance < -1).map(b => ({ ...b, balance: Math.abs(b.balance) }))
-      
-      const settlements = []
-      let cIdx = 0, dIdx = 0
-      while (cIdx < creditors.length && dIdx < debtors.length) {
-        const c = creditors[cIdx]
-        const d = debtors[dIdx]
-        const amount = Math.min(c.balance, d.balance)
-        
-        if (amount > 1) {
-          settlements.push({
-            from_id: d.id,
-            from_name: d.name,
-            to_id: c.id,
-            to_name: c.name,
-            amount: Math.round(amount)
-          })
-        }
-
-        c.balance -= amount
-        d.balance -= amount
-        if (c.balance < 1) cIdx++
-        if (d.balance < 1) dIdx++
-      }
-
-      // Generate share text
-      let shareText = `【${e.name}】精算結果\n\n`
-      if (settlements.length === 0) {
-        shareText += "精算の必要はありません。清算完了です！"
-      } else {
-        settlements.forEach(s => {
-          shareText += `${s.from_name} → ${s.to_name} : ¥${s.amount.toLocaleString()}\n`
-        })
-      }
-
-      setSettlement({
-        event_name: e.name,
-        settlements,
-        balances,
-        share_text: shareText
-      })
+      const settlementData = await api.getSettlement(eventId)
+      setSettlement(settlementData)
     } catch (e) { 
       console.error(e) 
     } finally { 

@@ -138,6 +138,16 @@ export const api = {
     await supabase.from('payments').delete().eq('id', id)
   },
 
+  // --- Settlement ---
+  async getSettlement(eventId) {
+    const res = await fetch(`/api/events/${eventId}/settlement`)
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.error || 'Failed to fetch settlement data')
+    }
+    return res.json()
+  },
+
   // --- Media ---
   async uploadImage(base64) {
     const res = await fetch(base64)
