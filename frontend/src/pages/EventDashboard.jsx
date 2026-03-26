@@ -115,7 +115,7 @@ export default function EventDashboard({ user }) {
   const coverUrl = event.image_url ? getImageUrl(event.image_url) : DEFAULT_COVERS[0]
 
   return (
-    <div className="min-h-dvh flex flex-col relative pb-32">
+    <div className="min-h-dvh flex flex-col relative pb-40">
       {/* ── Hero Header with Cover Image ── */}
       <header className="relative overflow-hidden">
         {/* Background Image */}

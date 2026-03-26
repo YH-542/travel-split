@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { api, getImageUrl } from '../utils/api'
+import { calculateSettlement, generateShareText } from '../utils/settlementLogic'
 
 const DEFAULT_COVERS = [
   'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80',
@@ -21,8 +22,15 @@ export default function SettlementResult({ user }) {
       const eventData = await api.getEvent(eventId)
       setEventDetail(eventData)
       
-      const settlementData = await api.getSettlement(eventId)
-      setSettlement(settlementData)
+      const { balances, settlements } = calculateSettlement(eventData.payments || [], eventData.members || [])
+      const shareText = generateShareText(eventData.name, settlements)
+
+      setSettlement({
+        event_name: eventData.name,
+        settlements,
+        balances,
+        share_text: shareText
+      })
     } catch (e) { 
       console.error(e) 
     } finally { 
@@ -50,7 +58,7 @@ export default function SettlementResult({ user }) {
   const coverUrl = eventDetail?.image_url ? getImageUrl(eventDetail.image_url) : DEFAULT_COVERS[0]
 
   return (
-    <div className="min-h-dvh flex flex-col relative pb-32">
+    <div className="min-h-dvh flex flex-col relative pb-40">
       {/* ── Hero Header with Cover Image ── */}
       <header className="relative overflow-hidden">
         <div className="absolute inset-0">
@@ -119,6 +127,11 @@ export default function SettlementResult({ user }) {
                 </div>
               ))}
             </div>
+          )}
+          {settlement.settlements.length > 0 && (
+            <p className="text-[10px] text-[#666] mt-4 leading-relaxed text-center">
+              ※この計算結果は、グループ全体で送金する回数が最小になるように、各メンバーの貸し借りを自動的に相殺（スマート清算）したものです。
+            </p>
           )}
         </div>
 

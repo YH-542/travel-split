@@ -121,7 +121,7 @@ export default function PaymentForm({ user }) {
   const coverUrl = eventImageUrl ? getImageUrl(eventImageUrl) : DEFAULT_COVERS[0]
 
   return (
-    <div className="min-h-dvh flex flex-col relative pb-32">
+    <div className="min-h-dvh flex flex-col relative pb-40">
       {/* ── Hero Header with Cover Image ── */}
       <header className="relative overflow-hidden">
         <div className="absolute inset-0">
